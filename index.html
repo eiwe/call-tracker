@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Call Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .deadline {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 30px;
+            padding: 12px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .deadline.urgent {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .checklist {
+            list-style: none;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            margin-bottom: 12px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .checklist-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .checklist-item.checked {
+            background: #d4edda;
+            opacity: 0.8;
+        }
+
+        .checklist-item input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            margin-right: 16px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .checklist-item label {
+            font-size: 18px;
+            color: #333;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .checklist-item.checked label {
+            text-decoration: line-through;
+            color: #666;
+        }
+
+        .progress {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e9ecef;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .progress-text {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .reset-info {
+            margin-top: 20px;
+            padding: 12px;
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #555;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .login-container h2 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .login-form input[type="password"] {
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .login-form input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .login-form button {
+            padding: 12px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .login-form button:hover {
+            transform: translateY(-2px);
+        }
+
+        .login-form button:active {
+            transform: translateY(0);
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+            text-align: center;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <button class="logout-btn hidden" id="logoutBtn">Logout</button>
+
+    <div class="login-container" id="loginContainer">
+        <h2>Weekly Call Tracker</h2>
+        <form class="login-form" id="loginForm">
+            <input type="password" id="passwordInput" placeholder="Enter password" required autocomplete="current-password">
+            <button type="submit">Login</button>
+            <div class="error-message" id="errorMessage">Incorrect password. Please try again.</div>
+        </form>
+    </div>
+
+    <div class="container hidden" id="mainContainer">
+        <h1>Weekly Call Tracker</h1>
+        <div class="deadline" id="deadline">Loading...</div>
+
+        <ul class="checklist" id="checklist">
+            <li class="checklist-item" data-name="Sagat">
+                <input type="checkbox" id="sagat">
+                <label for="sagat">Sagat</label>
+            </li>
+            <li class="checklist-item" data-name="Kellerman">
+                <input type="checkbox" id="kellerman">
+                <label for="kellerman">Kellerman</label>
+            </li>
+            <li class="checklist-item" data-name="Sidle">
+                <input type="checkbox" id="sidle">
+                <label for="sidle">Sidle</label>
+            </li>
+            <li class="checklist-item" data-name="Merlis">
+                <input type="checkbox" id="merlis">
+                <label for="merlis">Merlis</label>
+            </li>
+            <li class="checklist-item" data-name="Terezakis">
+                <input type="checkbox" id="terezakis">
+                <label for="terezakis">Terezakis</label>
+            </li>
+            <li class="checklist-item" data-name="DeVito">
+                <input type="checkbox" id="devito">
+                <label for="devito">DeVito</label>
+            </li>
+        </ul>
+
+        <div class="progress">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill">0%</div>
+            </div>
+            <div class="progress-text" id="progressText">0 of 6 calls completed</div>
+        </div>
+
+        <div class="reset-info">
+            Tracking resets every Wednesday at 9:00 PM
+        </div>
+    </div>
+
+    <script>
+        // ====== AUTHENTICATION ======
+        // IMPORTANT: Change this password hash!
+        // To generate a new hash, open browser console and run:
+        // await crypto.subtle.digest('SHA-256', new TextEncoder().encode('YourPasswordHere')).then(h => Array.from(new Uint8Array(h)).map(b => b.toString(16).padStart(2, '0')).join(''))
+        // Default password: "calltracker123"
+        const PASSWORD_HASH = '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918';
+        const AUTH_TOKEN_KEY = 'callTrackerAuth';
+        const SESSION_DAYS = 30;
+
+        async function hashPassword(password) {
+            const msgBuffer = new TextEncoder().encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        function isAuthenticated() {
+            const authData = localStorage.getItem(AUTH_TOKEN_KEY);
+            if (!authData) return false;
+
+            try {
+                const { token, expiry } = JSON.parse(authData);
+                if (Date.now() > expiry) {
+                    localStorage.removeItem(AUTH_TOKEN_KEY);
+                    return false;
+                }
+                return token === PASSWORD_HASH;
+            } catch {
+                return false;
+            }
+        }
+
+        function setAuthenticated() {
+            const expiry = Date.now() + (SESSION_DAYS * 24 * 60 * 60 * 1000);
+            localStorage.setItem(AUTH_TOKEN_KEY, JSON.stringify({
+                token: PASSWORD_HASH,
+                expiry: expiry
+            }));
+        }
+
+        function logout() {
+            localStorage.removeItem(AUTH_TOKEN_KEY);
+            document.getElementById('mainContainer').classList.add('hidden');
+            document.getElementById('loginContainer').classList.remove('hidden');
+            document.getElementById('logoutBtn').classList.add('hidden');
+            document.getElementById('passwordInput').value = '';
+        }
+
+        function showMainApp() {
+            document.getElementById('loginContainer').classList.add('hidden');
+            document.getElementById('mainContainer').classList.remove('hidden');
+            document.getElementById('logoutBtn').classList.remove('hidden');
+        }
+
+        // Handle login form
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const password = document.getElementById('passwordInput').value;
+            const hash = await hashPassword(password);
+
+            if (hash === PASSWORD_HASH) {
+                setAuthenticated();
+                showMainApp();
+                document.getElementById('errorMessage').classList.remove('show');
+                initializeApp();
+            } else {
+                document.getElementById('errorMessage').classList.add('show');
+            }
+        });
+
+        // Handle logout
+        document.getElementById('logoutBtn').addEventListener('click', logout);
+
+        // Check auth on page load
+        if (isAuthenticated()) {
+            showMainApp();
+        }
+
+        // ====== MAIN APP ======
+        const TEAM_MEMBERS = ['sagat', 'kellerman', 'sidle', 'merlis', 'terezakis', 'devito'];
+
+        // Get the next reset time (Wednesday 9pm)
+        function getNextResetTime() {
+            const now = new Date();
+            const next = new Date(now);
+
+            // Find next Wednesday
+            const daysUntilWednesday = (3 - now.getDay() + 7) % 7;
+            next.setDate(now.getDate() + (daysUntilWednesday === 0 && (now.getHours() >= 21) ? 7 : daysUntilWednesday));
+            next.setHours(21, 0, 0, 0);
+
+            // If we're past Wednesday 9pm, go to next week
+            if (now >= next) {
+                next.setDate(next.getDate() + 7);
+            }
+
+            return next;
+        }
+
+        // Get the deadline time (Wednesday 7pm of the current period)
+        function getDeadlineTime() {
+            const now = new Date();
+            const deadline = new Date(now);
+
+            // Find next Wednesday 7pm
+            const daysUntilWednesday = (3 - now.getDay() + 7) % 7;
+            deadline.setDate(now.getDate() + (daysUntilWednesday === 0 && (now.getHours() >= 19) ? 7 : daysUntilWednesday));
+            deadline.setHours(19, 0, 0, 0);
+
+            // If we're past Wednesday 7pm but before 9pm, deadline is next week
+            if (now >= deadline) {
+                deadline.setDate(deadline.getDate() + 7);
+            }
+
+            return deadline;
+        }
+
+        // Check if we need to reset
+        function checkAndReset() {
+            const lastReset = localStorage.getItem('lastReset');
+            const nextReset = getNextResetTime();
+            const now = new Date();
+
+            if (!lastReset || new Date(lastReset) < now && now >= new Date(nextReset.getTime() - 7 * 24 * 60 * 60 * 1000)) {
+                // Check if we've passed a reset time
+                const lastResetDate = lastReset ? new Date(lastReset) : new Date(0);
+                const lastResetWednesday = new Date(lastResetDate);
+                lastResetWednesday.setDate(lastResetDate.getDate() + (3 - lastResetDate.getDay() + 7) % 7);
+                lastResetWednesday.setHours(21, 0, 0, 0);
+
+                if (lastResetDate < lastResetWednesday && now >= lastResetWednesday) {
+                    // Reset all checkboxes
+                    TEAM_MEMBERS.forEach(member => {
+                        localStorage.removeItem(member);
+                    });
+                    localStorage.setItem('lastReset', now.toISOString());
+                }
+            }
+
+            if (!lastReset) {
+                localStorage.setItem('lastReset', now.toISOString());
+            }
+        }
+
+        // Update deadline display
+        function updateDeadline() {
+            const deadline = getDeadlineTime();
+            const now = new Date();
+            const diff = deadline - now;
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+            let deadlineText = 'Deadline: ';
+            if (days > 0) {
+                deadlineText += `${days} day${days > 1 ? 's' : ''}, `;
+            }
+            deadlineText += `${hours} hour${hours !== 1 ? 's' : ''}, ${minutes} minute${minutes !== 1 ? 's' : ''} remaining`;
+
+            const deadlineEl = document.getElementById('deadline');
+            deadlineEl.textContent = deadlineText;
+
+            // Make it urgent if less than 24 hours
+            if (diff < 24 * 60 * 60 * 1000) {
+                deadlineEl.classList.add('urgent');
+            } else {
+                deadlineEl.classList.remove('urgent');
+            }
+        }
+
+        // Update progress bar
+        function updateProgress() {
+            const completed = TEAM_MEMBERS.filter(member =>
+                localStorage.getItem(member) === 'true'
+            ).length;
+
+            const percentage = (completed / TEAM_MEMBERS.length) * 100;
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+
+            progressFill.style.width = percentage + '%';
+            progressFill.textContent = Math.round(percentage) + '%';
+            progressText.textContent = `${completed} of ${TEAM_MEMBERS.length} calls completed`;
+        }
+
+        // Initialize checkboxes
+        function initializeCheckboxes() {
+            TEAM_MEMBERS.forEach(member => {
+                const checkbox = document.getElementById(member);
+                const item = checkbox.parentElement;
+                const isChecked = localStorage.getItem(member) === 'true';
+
+                checkbox.checked = isChecked;
+                if (isChecked) {
+                    item.classList.add('checked');
+                }
+
+                // Add event listeners
+                checkbox.addEventListener('change', function() {
+                    localStorage.setItem(member, this.checked);
+                    if (this.checked) {
+                        item.classList.add('checked');
+                    } else {
+                        item.classList.remove('checked');
+                    }
+                    updateProgress();
+                });
+
+                // Make the whole item clickable
+                item.addEventListener('click', function(e) {
+                    if (e.target !== checkbox) {
+                        checkbox.click();
+                    }
+                });
+            });
+        }
+
+        // Initialize app
+        function initializeApp() {
+            checkAndReset();
+            initializeCheckboxes();
+            updateProgress();
+            updateDeadline();
+
+            // Update deadline every minute
+            setInterval(updateDeadline, 60000);
+
+            // Check for reset every minute
+            setInterval(() => {
+                checkAndReset();
+                initializeCheckboxes();
+                updateProgress();
+            }, 60000);
+        }
+
+        // Auto-initialize if already authenticated
+        if (isAuthenticated()) {
+            initializeApp();
+        }
+    </script>
+</body>
+</html>
