@@ -2,10 +2,10 @@
 
 A simple web app to track weekly calls with team members.
 
-## Default Password
+## Password
 
 ```
-calltracker123
+K-9taalisto!
 ```
 
 ## How to Change the Password
